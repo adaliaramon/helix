@@ -2402,7 +2402,10 @@ fn push_jump(editor: &mut Editor) {
 }
 
 fn goto_line(cx: &mut Context) {
-    goto_line_impl(cx.editor, cx.count)
+    match cx.count {
+        Some(_) => goto_line_impl(cx.editor, cx.count),
+        None => goto_file_end(cx),
+    }
 }
 
 fn goto_line_impl(editor: &mut Editor, count: Option<NonZeroUsize>) {

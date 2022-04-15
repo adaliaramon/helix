@@ -1073,7 +1073,17 @@ fn run_shell_command(
     _event: PromptEvent,
 ) -> anyhow::Result<()> {
     let shell = &cx.editor.config().shell;
-    let (output, success) = shell_impl(shell, &args.join(" "), None)?;
+    let (_view, doc) = current!(cx.editor);
+    let input = &args.join(" ");
+    let processed_input;
+    let input = match doc.relative_path() {
+        Some(path) => {
+            processed_input = input.replace("%", path.to_str().unwrap());
+            processed_input.as_str()
+        }
+        None => input,
+    };
+    let (output, success) = shell_impl(shell, input, None)?;
     if !success {
         cx.editor.set_error("Command failed");
     }

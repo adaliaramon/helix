@@ -1112,6 +1112,17 @@ fn run_shell_command(
     Ok(())
 }
 
+fn pipe(
+    cx: &mut compositor::Context,
+    args: &[Cow<str>],
+    _event: PromptEvent,
+) -> anyhow::Result<()> {
+    ensure!(!args.is_empty(), "Shell command required");
+    shell(cx, &args.join(" "), &ShellBehavior::Replace);
+
+    Ok(())
+}
+
 pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         TypableCommand {
             name: "quit",
@@ -1546,6 +1557,13 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
             doc: "Run a shell command",
             fun: run_shell_command,
             completer: Some(completers::directory),
+        },
+        TypableCommand {            
+            name: "pipe",
+            aliases: &[],
+            doc: "Pipe each selection to the shell command.",
+            fun: pipe,
+            completer: None,
         },
     ];
 

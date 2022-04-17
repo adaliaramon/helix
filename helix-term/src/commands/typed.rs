@@ -1084,7 +1084,9 @@ fn run_shell_command(
         None => input,
     };
     let (output, success) = shell_impl(shell, input, None)?;
-    if !success {
+    if success {
+        cx.editor.set_status("Command succeed");
+    } else {
         cx.editor.set_error("Command failed");
     }
 

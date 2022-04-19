@@ -1560,7 +1560,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
             fun: run_shell_command,
             completer: Some(completers::directory),
         },
-        TypableCommand {            
+        TypableCommand {
             name: "pipe",
             aliases: &[],
             doc: "Pipe each selection to the shell command.",

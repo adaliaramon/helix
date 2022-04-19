@@ -1078,7 +1078,7 @@ fn run_shell_command(
     let processed_input;
     let input = match doc.relative_path() {
         Some(path) => {
-            processed_input = input.replace("%", path.to_str().unwrap());
+            processed_input = input.replace('%', path.to_str().unwrap());
             processed_input.as_str()
         }
         None => input,

@@ -61,3 +61,5 @@
 | `:tree-sitter-subtree`, `:ts-subtree` | Display tree sitter subtree under cursor, primarily for debugging queries. |
 | `:config-reload` | Refreshes helix's config. |
 | `:config-open` | Open the helix config.toml file. |
+| `:run-shell-command`, `:sh` | Run a shell command |
+| `:pipe` | Pipe each selection to the shell command. |

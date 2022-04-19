@@ -1067,6 +1067,64 @@ fn refresh_config(
     Ok(())
 }
 
+fn run_shell_command(
+    cx: &mut compositor::Context,
+    args: &[Cow<str>],
+    _event: PromptEvent,
+) -> anyhow::Result<()> {
+    let shell = &cx.editor.config().shell;
+    let (_view, doc) = current!(cx.editor);
+    let input = &args.join(" ");
+    let processed_input;
+    let input = match doc.relative_path() {
+        Some(path) => {
+            processed_input = input.replace('%', path.to_str().unwrap());
+            processed_input.as_str()
+        }
+        None => input,
+    };
+    let (output, success) = shell_impl(shell, input, None)?;
+    if success {
+        cx.editor.set_status("Command succeed");
+    } else {
+        cx.editor.set_error("Command failed");
+    }
+
+    if !output.is_empty() {
+        let callback = async move {
+            let call: job::Callback =
+                Box::new(move |editor: &mut Editor, compositor: &mut Compositor| {
+                    let contents = ui::Markdown::new(
+                        format!("```sh\n{}\n```", output),
+                        editor.syn_loader.clone(),
+                    );
+                    let mut popup = Popup::new("shell", contents);
+                    popup.set_position(Some(helix_core::Position::new(
+                        editor.cursor().0.unwrap_or_default().row,
+                        2,
+                    )));
+                    compositor.replace_or_push("shell", popup);
+                });
+            Ok(call)
+        };
+
+        cx.jobs.callback(callback);
+    }
+
+    Ok(())
+}
+
+fn pipe(
+    cx: &mut compositor::Context,
+    args: &[Cow<str>],
+    _event: PromptEvent,
+) -> anyhow::Result<()> {
+    ensure!(!args.is_empty(), "Shell command required");
+    shell(cx, &args.join(" "), &ShellBehavior::Replace);
+
+    Ok(())
+}
+
 pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         TypableCommand {
             name: "quit",
@@ -1493,6 +1551,20 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
             aliases: &[],
             doc: "Open the helix config.toml file.",
             fun: open_config,
+            completer: None,
+        },
+        TypableCommand {
+            name: "run-shell-command",
+            aliases: &["sh"],
+            doc: "Run a shell command",
+            fun: run_shell_command,
+            completer: Some(completers::directory),
+        },
+        TypableCommand {
+            name: "pipe",
+            aliases: &[],
+            doc: "Pipe each selection to the shell command.",
+            fun: pipe,
             completer: None,
         },
     ];

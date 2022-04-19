@@ -56,6 +56,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "p" => goto_previous_buffer,
             "." => goto_last_modification,
         },
+        "$" => goto_line_end,
         ":" => command_mode,
 
         "i" => insert_mode,
@@ -281,7 +282,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "A-|" => shell_pipe_to,
         "!" => shell_insert_output,
         "A-!" => shell_append_output,
-        "$" => shell_keep_pipe,
+        "A-$" => shell_keep_pipe,
         "C-z" => suspend,
 
         "C-a" => increment,

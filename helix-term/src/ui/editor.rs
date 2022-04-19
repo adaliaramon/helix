@@ -466,7 +466,7 @@ impl EditorView {
         // avoid lots of small allocations by reusing a text buffer for each line
         let mut text = String::with_capacity(8);
 
-        for (constructor, width) in view.gutters() {
+        for (constructor, width) in &view.gutters {
             let gutter = constructor(editor, doc, view, theme, is_focused, *width);
             text.reserve(*width); // ensure there's enough space for the gutter
             for (i, line) in (view.offset.row..(last_line + 1)).enumerate() {
@@ -749,7 +749,12 @@ impl EditorView {
     fn command_mode(&mut self, mode: Mode, cxt: &mut commands::Context, event: KeyEvent) {
         match event {
             // count handling
-            key!(i @ '0'..='9') => {
+            key!(i @ '0'..='9') if cxt.editor.count.is_some() => {
+                let i = i.to_digit(10).unwrap() as usize;
+                cxt.editor.count =
+                    std::num::NonZeroUsize::new(cxt.editor.count.map_or(i, |c| c.get() * 10 + i));
+            }
+            key!(i @ '1'..='9') if cxt.editor.count.is_none() => {
                 let i = i.to_digit(10).unwrap() as usize;
                 cxt.editor.count =
                     std::num::NonZeroUsize::new(cxt.editor.count.map_or(i, |c| c.get() * 10 + i));

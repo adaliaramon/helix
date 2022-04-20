@@ -2361,6 +2361,8 @@ fn open_above(cx: &mut Context) {
 }
 
 fn normal_mode(cx: &mut Context) {
+    collapse_selection(cx);
+
     let (view, doc) = current!(cx.editor);
 
     if doc.mode == Mode::Normal {

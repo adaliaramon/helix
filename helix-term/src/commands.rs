@@ -875,6 +875,7 @@ where
         .clone()
         .transform(|range| move_fn(text, range, count));
     doc.set_selection(view.id, selection);
+    collapse_selection(cx);
 }
 
 fn move_next_word_start(cx: &mut Context) {

@@ -2532,6 +2532,7 @@ fn exit_select_mode(cx: &mut Context) {
     let doc = doc_mut!(cx.editor);
     if doc.mode == Mode::Select {
         doc.mode = Mode::Normal;
+        collapse_selection(cx);
     }
 }
 

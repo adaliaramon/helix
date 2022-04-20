@@ -1116,7 +1116,7 @@ fn find_char_impl<F, M: CharMatcher + Clone + Copy>(
             if extend {
                 range.put_cursor(text, pos, true)
             } else {
-                Range::point(range.cursor(text)).put_cursor(text, pos, true)
+                Range::point(pos)
             }
         })
     });

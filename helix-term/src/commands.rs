@@ -2429,7 +2429,7 @@ fn push_jump(editor: &mut Editor) {
 fn goto_line(cx: &mut Context) {
     match cx.count {
         Some(_) => goto_line_impl(cx.editor, cx.count),
-        None => goto_file_end(cx),
+        None => goto_last_line(cx),
     }
 }
 

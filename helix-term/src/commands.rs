@@ -951,11 +951,17 @@ fn goto_file_start(cx: &mut Context) {
         push_jump(cx.editor);
         let (view, doc) = current!(cx.editor);
         let text = doc.text().slice(..);
-        let selection = doc
-            .selection(view.id)
-            .clone()
-            .transform(|range| range.put_cursor(text, 0, doc.mode == Mode::Select));
+        let selection = doc.selection(view.id).clone().transform(|range| {
+            range.put_cursor(
+                text,
+                0,
+                doc.mode == Mode::Select || doc.mode == Mode::VisualLine,
+            )
+        });
         doc.set_selection(view.id, selection);
+        if doc.mode == Mode::VisualLine {
+            extend_to_line_bounds(cx);
+        }
     }
 }
 
@@ -964,11 +970,17 @@ fn goto_file_end(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
     let text = doc.text().slice(..);
     let pos = doc.text().len_chars();
-    let selection = doc
-        .selection(view.id)
-        .clone()
-        .transform(|range| range.put_cursor(text, pos, doc.mode == Mode::Select));
+    let selection = doc.selection(view.id).clone().transform(|range| {
+        range.put_cursor(
+            text,
+            pos,
+            doc.mode == Mode::Select || doc.mode == Mode::VisualLine,
+        )
+    });
     doc.set_selection(view.id, selection);
+    if doc.mode == Mode::VisualLine {
+        extend_to_line_bounds(cx);
+    }
 }
 
 fn goto_file(cx: &mut Context) {
@@ -2444,6 +2456,10 @@ fn goto_line(cx: &mut Context) {
         Some(_) => goto_line_impl(cx.editor, cx.count),
         None => goto_last_line(cx),
     }
+    let (_, doc) = current!(cx.editor);
+    if doc.mode == Mode::VisualLine {
+        extend_to_line_bounds(cx);
+    }
 }
 
 fn goto_line_impl(editor: &mut Editor, count: Option<NonZeroUsize>) {
@@ -2460,10 +2476,13 @@ fn goto_line_impl(editor: &mut Editor, count: Option<NonZeroUsize>) {
         let line_idx = std::cmp::min(count.get() - 1, max_line);
         let text = doc.text().slice(..);
         let pos = doc.text().line_to_char(line_idx);
-        let selection = doc
-            .selection(view.id)
-            .clone()
-            .transform(|range| range.put_cursor(text, pos, doc.mode == Mode::Select));
+        let selection = doc.selection(view.id).clone().transform(|range| {
+            range.put_cursor(
+                text,
+                pos,
+                doc.mode == Mode::Select || doc.mode == Mode::VisualLine,
+            )
+        });
         doc.set_selection(view.id, selection);
     }
 }
@@ -2480,11 +2499,17 @@ fn goto_last_line(cx: &mut Context) {
     };
     let text = doc.text().slice(..);
     let pos = doc.text().line_to_char(line_idx);
-    let selection = doc
-        .selection(view.id)
-        .clone()
-        .transform(|range| range.put_cursor(text, pos, doc.mode == Mode::Select));
+    let selection = doc.selection(view.id).clone().transform(|range| {
+        range.put_cursor(
+            text,
+            pos,
+            doc.mode == Mode::Select || doc.mode == Mode::VisualLine,
+        )
+    });
     doc.set_selection(view.id, selection);
+    if doc.mode == Mode::VisualLine {
+        extend_to_line_bounds(cx);
+    }
 }
 
 fn goto_last_accessed_file(cx: &mut Context) {

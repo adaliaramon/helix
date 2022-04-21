@@ -316,17 +316,15 @@ pub fn default() -> HashMap<Mode, Keymap> {
 
         "v" => normal_mode,
     }));
-    let visual_line = keymap!({ "Visual line mode"
+    let mut visual_line = normal.clone();
+    visual_line.merge_nodes(keymap!({ "Visual line mode"
         "j" | "down" => extend_to_line_down_bounds,
         "k" | "up" => extend_to_line_up_bounds,
 
-        "d" => delete_selection,
-        "A-d" => delete_selection_noyank,
-        "c" => change_selection,
-        "A-c" => change_selection_noyank,
-
         "esc" => exit_visual_line_mode,
-    });
+
+        "w" | "W" | "b" | "B" | "e" | "E" | "h" | "left" | "l" | "right" => no_op,
+    }));
     let insert = keymap!({ "Insert mode"
         "esc" => normal_mode,
 

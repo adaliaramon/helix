@@ -17,7 +17,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "F" => find_prev_char,
         "r" => replace,
         "R" => replace_with_yanked,
-        "A-." =>  repeat_last_motion,
+        ";" =>  repeat_last_motion,
 
         "~" => switch_case,
         "`" => switch_to_lowercase,
@@ -77,7 +77,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "s" => select_regex,
         "A-s" => split_selection_on_newline,
         "S" => split_selection,
-        ";" => collapse_selection,
+        // ";" => collapse_selection,
         "A-;" => flip_selections,
         "A-k" | "A-up" => expand_selection,
         "A-j" | "A-down" => shrink_selection,

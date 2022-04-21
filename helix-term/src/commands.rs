@@ -1199,6 +1199,10 @@ fn repeat_last_motion(cx: &mut Context) {
         m.run(cx.editor);
         cx.editor.last_motion = last_motion;
     }
+    let (_, doc) = current!(cx.editor);
+    if doc.mode == Mode::Normal {
+        collapse_selection(cx);
+    }
 }
 
 fn replace(cx: &mut Context) {

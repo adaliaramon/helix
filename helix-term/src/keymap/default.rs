@@ -374,6 +374,10 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "E" => delete_end_of_long_word,
             "b" => delete_beginning_of_word,
             "B" => delete_beginning_of_long_word,
+            "t" => delete_till_next_char,
+            "T" => delete_till_prev_char,
+            "f" => delete_find_next_char,
+            "F" => delete_find_prev_char,
             },
         "c" => { "Change"
             "a" => change_textobject_around,
@@ -384,6 +388,10 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "E" => change_end_of_long_word,
             "b" => change_beginning_of_word,
             "B" => change_beginning_of_long_word,
+            "t" => change_till_next_char,
+            "T" => change_till_prev_char,
+            "f" => change_find_next_char,
+            "F" => change_find_prev_char,
             },
     }));
     hashmap!(

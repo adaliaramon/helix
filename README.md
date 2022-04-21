@@ -1,4 +1,8 @@
-# Helix
+# Helix-Vim
+
+Fork of [helix](https://github.com/helix-editor/helix) with vim-like keybindings (WIP). This includes:
+- Visual line mode
+- Action-Object workflow
 
 
 [![Build status](https://github.com/helix-editor/helix/actions/workflows/build.yml/badge.svg)](https://github.com/helix-editor/helix/actions)

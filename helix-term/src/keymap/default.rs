@@ -370,10 +370,22 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "d" => { "Delete"
             "a" => delete_textobject_around,
             "i" => delete_textobject_inner,
+            "w" => delete_word,
+            "W" => delete_long_word,
+            "e" => delete_end_of_word,
+            "E" => delete_end_of_long_word,
+            "b" => delete_beginning_of_word,
+            "B" => delete_beginning_of_long_word,
             },
         "c" => { "Change"
             "a" => change_textobject_around,
             "i" => change_textobject_inner,
+            "w" => change_word,
+            "W" => change_long_word,
+            "e" => change_end_of_word,
+            "E" => change_end_of_long_word,
+            "b" => change_beginning_of_word,
+            "B" => change_beginning_of_long_word,
             },
     }));
     hashmap!(

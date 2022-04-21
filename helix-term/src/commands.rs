@@ -417,7 +417,10 @@ impl MappableCommand {
         record_macro, "Record macro",
         replay_macro, "Replay macro",
         command_palette, "Open command palette",
-    );
+        visual_line_mode, "Enter visual line mode",
+        exit_visual_line_mode, "Exit visual line mode",
+        extend_to_line_up_bounds, "Extend selection to line bounds (line-wise selection)",
+        extend_to_line_down_bounds, "Extend selection to line bounds (line-wise selection)",    );
 }
 
 impl fmt::Debug for MappableCommand {
@@ -945,11 +948,17 @@ fn goto_file_start(cx: &mut Context) {
         push_jump(cx.editor);
         let (view, doc) = current!(cx.editor);
         let text = doc.text().slice(..);
-        let selection = doc
-            .selection(view.id)
-            .clone()
-            .transform(|range| range.put_cursor(text, 0, doc.mode == Mode::Select));
+        let selection = doc.selection(view.id).clone().transform(|range| {
+            range.put_cursor(
+                text,
+                0,
+                doc.mode == Mode::Select || doc.mode == Mode::VisualLine,
+            )
+        });
         doc.set_selection(view.id, selection);
+        if doc.mode == Mode::VisualLine {
+            extend_to_line_bounds(cx);
+        }
     }
 }
 
@@ -958,11 +967,17 @@ fn goto_file_end(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
     let text = doc.text().slice(..);
     let pos = doc.text().len_chars();
-    let selection = doc
-        .selection(view.id)
-        .clone()
-        .transform(|range| range.put_cursor(text, pos, doc.mode == Mode::Select));
+    let selection = doc.selection(view.id).clone().transform(|range| {
+        range.put_cursor(
+            text,
+            pos,
+            doc.mode == Mode::Select || doc.mode == Mode::VisualLine,
+        )
+    });
     doc.set_selection(view.id, selection);
+    if doc.mode == Mode::VisualLine {
+        extend_to_line_bounds(cx);
+    }
 }
 
 fn goto_file(cx: &mut Context) {
@@ -1954,6 +1969,7 @@ fn delete_selection_impl(cx: &mut Context, op: Operation) {
         Operation::Delete => {
             // exit select mode, if currently in select mode
             exit_select_mode(cx);
+            exit_visual_line_mode(cx);
         }
         Operation::Change => {
             enter_insert_mode(doc);
@@ -2434,7 +2450,11 @@ fn push_jump(editor: &mut Editor) {
 }
 
 fn goto_line(cx: &mut Context) {
-    goto_line_impl(cx.editor, cx.count)
+    goto_line_impl(cx.editor, cx.count);
+    let (_, doc) = current!(cx.editor);
+    if doc.mode == Mode::VisualLine {
+        extend_to_line_bounds(cx);
+    }
 }
 
 fn goto_line_impl(editor: &mut Editor, count: Option<NonZeroUsize>) {
@@ -2451,10 +2471,13 @@ fn goto_line_impl(editor: &mut Editor, count: Option<NonZeroUsize>) {
         let line_idx = std::cmp::min(count.get() - 1, max_line);
         let text = doc.text().slice(..);
         let pos = doc.text().line_to_char(line_idx);
-        let selection = doc
-            .selection(view.id)
-            .clone()
-            .transform(|range| range.put_cursor(text, pos, doc.mode == Mode::Select));
+        let selection = doc.selection(view.id).clone().transform(|range| {
+            range.put_cursor(
+                text,
+                pos,
+                doc.mode == Mode::Select || doc.mode == Mode::VisualLine,
+            )
+        });
         doc.set_selection(view.id, selection);
     }
 }
@@ -2471,11 +2494,17 @@ fn goto_last_line(cx: &mut Context) {
     };
     let text = doc.text().slice(..);
     let pos = doc.text().line_to_char(line_idx);
-    let selection = doc
-        .selection(view.id)
-        .clone()
-        .transform(|range| range.put_cursor(text, pos, doc.mode == Mode::Select));
+    let selection = doc.selection(view.id).clone().transform(|range| {
+        range.put_cursor(
+            text,
+            pos,
+            doc.mode == Mode::Select || doc.mode == Mode::VisualLine,
+        )
+    });
     doc.set_selection(view.id, selection);
+    if doc.mode == Mode::VisualLine {
+        extend_to_line_bounds(cx);
+    }
 }
 
 fn goto_last_accessed_file(cx: &mut Context) {
@@ -4537,4 +4566,28 @@ fn replay_macro(cx: &mut Context) {
             }
         }
     }));
+}
+
+fn visual_line_mode(cx: &mut Context) {
+    let (_, doc) = current!(cx.editor);
+    doc.mode = Mode::VisualLine;
+    extend_to_line_bounds(cx);
+}
+
+fn exit_visual_line_mode(cx: &mut Context) {
+    let doc = doc_mut!(cx.editor);
+    if doc.mode == Mode::VisualLine {
+        doc.mode = Mode::Normal;
+        collapse_selection(cx);
+    }
+}
+
+fn extend_to_line_up_bounds(cx: &mut Context) {
+    extend_line_up(cx);
+    extend_to_line_bounds(cx);
+}
+
+fn extend_to_line_down_bounds(cx: &mut Context) {
+    extend_line_down(cx);
+    extend_to_line_bounds(cx);
 }

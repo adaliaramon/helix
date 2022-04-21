@@ -292,6 +292,7 @@ impl EditorView {
             Mode::Insert => theme.find_scope_index("ui.cursor.insert"),
             Mode::Select => theme.find_scope_index("ui.cursor.select"),
             Mode::Normal => Some(base_cursor_scope),
+            Mode::VisualLine => theme.find_scope_index("ui.cursor.visualline"),
         }
         .unwrap_or(base_cursor_scope);
 
@@ -637,6 +638,7 @@ impl EditorView {
             Mode::Insert => "INS",
             Mode::Select => "SEL",
             Mode::Normal => "NOR",
+            Mode::VisualLine => "VLN",
         };
         let progress = doc
             .language_server()

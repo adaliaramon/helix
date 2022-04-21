@@ -417,7 +417,10 @@ impl MappableCommand {
         record_macro, "Record macro",
         replay_macro, "Replay macro",
         command_palette, "Open command palette",
-    );
+        visual_line_mode, "Enter visual line mode",
+        exit_visual_line_mode, "Exit visual line mode",
+        extend_to_line_up_bounds, "Extend selection to line bounds (line-wise selection)",
+        extend_to_line_down_bounds, "Extend selection to line bounds (line-wise selection)",    );
 }
 
 impl fmt::Debug for MappableCommand {
@@ -1954,6 +1957,7 @@ fn delete_selection_impl(cx: &mut Context, op: Operation) {
         Operation::Delete => {
             // exit select mode, if currently in select mode
             exit_select_mode(cx);
+            exit_visual_line_mode(cx);
         }
         Operation::Change => {
             enter_insert_mode(doc);
@@ -4537,4 +4541,28 @@ fn replay_macro(cx: &mut Context) {
             }
         }
     }));
+}
+
+fn visual_line_mode(cx: &mut Context) {
+    let (_, doc) = current!(cx.editor);
+    doc.mode = Mode::VisualLine;
+    extend_to_line_bounds(cx);
+}
+
+fn exit_visual_line_mode(cx: &mut Context) {
+    let doc = doc_mut!(cx.editor);
+    if doc.mode == Mode::VisualLine {
+        doc.mode = Mode::Normal;
+        collapse_selection(cx);
+    }
+}
+
+fn extend_to_line_up_bounds(cx: &mut Context) {
+    extend_line_up(cx);
+    extend_to_line_bounds(cx);
+}
+
+fn extend_to_line_down_bounds(cx: &mut Context) {
+    extend_line_down(cx);
+    extend_to_line_bounds(cx);
 }

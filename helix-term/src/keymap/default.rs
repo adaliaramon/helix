@@ -35,6 +35,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "E" => move_next_long_word_end,
 
         "v" => select_mode,
+        "V" => visual_line_mode,
         "G" => goto_line,
         "g" => { "Goto"
             "g" => goto_file_start,
@@ -313,6 +314,17 @@ pub fn default() -> HashMap<Mode, Keymap> {
 
         "v" => normal_mode,
     }));
+    let visual_line = keymap!({ "Visual line mode"
+        "j" | "down" => extend_to_line_down_bounds,
+        "k" | "up" => extend_to_line_up_bounds,
+
+        "d" => delete_selection,
+        "A-d" => delete_selection_noyank,
+        "c" => change_selection,
+        "A-c" => change_selection_noyank,
+
+        "esc" => exit_visual_line_mode,
+    });
     let insert = keymap!({ "Insert mode"
         "esc" => normal_mode,
 
@@ -358,5 +370,6 @@ pub fn default() -> HashMap<Mode, Keymap> {
         Mode::Normal => Keymap::new(normal),
         Mode::Select => Keymap::new(select),
         Mode::Insert => Keymap::new(insert),
+        Mode::VisualLine => Keymap::new(visual_line),
     )
 }

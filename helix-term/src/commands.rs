@@ -3044,7 +3044,7 @@ fn yank(cx: &mut Context) {
         .write(cx.register.unwrap_or('"'), values);
 
     cx.editor.set_status(msg);
-    exit_select_mode(cx);
+    normal_mode(cx);
 }
 
 fn yank_joined_to_clipboard_impl(

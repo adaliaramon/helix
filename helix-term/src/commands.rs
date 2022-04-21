@@ -423,6 +423,8 @@ impl MappableCommand {
         extend_to_line_down_bounds, "Extend selection to line bounds (line-wise selection)",
         delete_textobject_around, "Delete around object",
         delete_textobject_inner, "Delete inside object",
+        change_textobject_around, "Change around object",
+        change_textobject_inner, "Change inside object",
     );
 }
 
@@ -4109,6 +4111,8 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: 
     if let Some((title, abbrev)) = match (objtype, action) {
         (textobject::TextObject::Inside, Some(Operation::Delete)) => Some(("Delete inside", "di")),
         (textobject::TextObject::Around, Some(Operation::Delete)) => Some(("Delete around", "da")),
+        (textobject::TextObject::Inside, Some(Operation::Change)) => Some(("Change inside", "ci")),
+        (textobject::TextObject::Around, Some(Operation::Change)) => Some(("Change around", "ca")),
         (textobject::TextObject::Inside, None) => Some(("Match inside", "mi")),
         (textobject::TextObject::Around, None) => Some(("Match around", "ma")),
         _ => return,
@@ -4620,4 +4624,12 @@ fn delete_textobject_around(cx: &mut Context) {
 
 fn delete_textobject_inner(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Inside, Some(Operation::Delete));
+}
+
+fn change_textobject_around(cx: &mut Context) {
+    select_textobject(cx, textobject::TextObject::Around, Some(Operation::Change));
+}
+
+fn change_textobject_inner(cx: &mut Context) {
+    select_textobject(cx, textobject::TextObject::Inside, Some(Operation::Change));
 }

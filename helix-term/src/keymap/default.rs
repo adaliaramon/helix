@@ -369,6 +369,10 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "a" => delete_textobject_around,
             "i" => delete_textobject_inner,
             },
+        "c" => { "Change"
+            "a" => change_textobject_around,
+            "i" => change_textobject_inner,
+            },
     }));
     hashmap!(
         Mode::Normal => Keymap::new(normal),

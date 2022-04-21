@@ -432,6 +432,10 @@ impl MappableCommand {
         delete_end_of_long_word, "Delete end of long word",
         delete_beginning_of_word, "Delete beginning of word",
         delete_beginning_of_long_word, "Delete beginning of long word",
+        delete_till_next_char, "Delete till next occurrence of char",
+        delete_till_prev_char, "Delete till previous occurrence of char",
+        delete_find_next_char, "Delete to next occurrence of char",
+        delete_find_prev_char, "Delete to previous occurrence of char",
         change_textobject_around, "Change around object",
         change_textobject_inner, "Change inside object",
         change_word, "Change word",
@@ -440,6 +444,10 @@ impl MappableCommand {
         change_end_of_long_word, "Change end of long word",
         change_beginning_of_word, "Change beginning of word",
         change_beginning_of_long_word, "Change beginning of long word",
+        change_till_next_char, "Change till next occurrence of char",
+        change_till_prev_char, "Change till previous occurrence of char",
+        change_find_next_char, "Change to next occurrence of char",
+        change_find_prev_char, "Change to previous occurrence of char",
     );
 }
 
@@ -1083,8 +1091,13 @@ fn extend_next_long_word_end(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_long_word_end)
 }
 
-fn will_find_char<F>(cx: &mut Context, search_fn: F, inclusive: bool, extend: bool)
-where
+fn will_find_char<F>(
+    cx: &mut Context,
+    search_fn: F,
+    inclusive: bool,
+    extend: bool,
+    action: Option<Operation>,
+) where
     F: Fn(RopeSlice, char, usize, usize, bool) -> Option<usize> + 'static,
 {
     // TODO: count is reset to 1 before next key so we move it into the closure here.
@@ -1119,6 +1132,11 @@ where
         cx.editor.last_motion = Some(Motion(Box::new(move |editor: &mut Editor| {
             find_char_impl(editor, &search_fn, inclusive, true, ch, 1);
         })));
+        match action {
+            Some(Operation::Delete) => delete_selection(cx),
+            Some(Operation::Change) => change_selection(cx),
+            None => (),
+        }
     })
 }
 
@@ -1197,35 +1215,35 @@ fn find_prev_char_impl(
 }
 
 fn find_till_char(cx: &mut Context) {
-    will_find_char(cx, find_next_char_impl, false, false)
+    will_find_char(cx, find_next_char_impl, false, false, None)
 }
 
 fn find_next_char(cx: &mut Context) {
-    will_find_char(cx, find_next_char_impl, true, false)
+    will_find_char(cx, find_next_char_impl, true, false, None)
 }
 
 fn extend_till_char(cx: &mut Context) {
-    will_find_char(cx, find_next_char_impl, false, true)
+    will_find_char(cx, find_next_char_impl, false, true, None)
 }
 
 fn extend_next_char(cx: &mut Context) {
-    will_find_char(cx, find_next_char_impl, true, true)
+    will_find_char(cx, find_next_char_impl, true, true, None)
 }
 
 fn till_prev_char(cx: &mut Context) {
-    will_find_char(cx, find_prev_char_impl, false, false)
+    will_find_char(cx, find_prev_char_impl, false, false, None)
 }
 
 fn find_prev_char(cx: &mut Context) {
-    will_find_char(cx, find_prev_char_impl, true, false)
+    will_find_char(cx, find_prev_char_impl, true, false, None)
 }
 
 fn extend_till_prev_char(cx: &mut Context) {
-    will_find_char(cx, find_prev_char_impl, false, true)
+    will_find_char(cx, find_prev_char_impl, false, true, None)
 }
 
 fn extend_prev_char(cx: &mut Context) {
-    will_find_char(cx, find_prev_char_impl, true, true)
+    will_find_char(cx, find_prev_char_impl, true, true, None)
 }
 
 fn repeat_last_motion(cx: &mut Context) {
@@ -4120,7 +4138,7 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: 
             match action {
                 Some(Operation::Delete) => delete_selection(cx),
                 Some(Operation::Change) => change_selection(cx),
-                _ => (),
+                None => (),
             }
         }
     });
@@ -4673,6 +4691,34 @@ fn delete_beginning_of_long_word(cx: &mut Context) {
     delete_selection(cx);
 }
 
+fn delete_till_next_char(cx: &mut Context) {
+    will_find_char(
+        cx,
+        find_next_char_impl,
+        false,
+        true,
+        Some(Operation::Delete),
+    );
+}
+
+fn delete_till_prev_char(cx: &mut Context) {
+    will_find_char(
+        cx,
+        find_prev_char_impl,
+        false,
+        true,
+        Some(Operation::Delete),
+    );
+}
+
+fn delete_find_next_char(cx: &mut Context) {
+    will_find_char(cx, find_next_char_impl, true, true, Some(Operation::Delete));
+}
+
+fn delete_find_prev_char(cx: &mut Context) {
+    will_find_char(cx, find_prev_char_impl, true, true, Some(Operation::Delete));
+}
+
 fn change_textobject_around(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Around, Some(Operation::Change));
 }
@@ -4709,4 +4755,32 @@ fn change_beginning_of_word(cx: &mut Context) {
 fn change_beginning_of_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_prev_long_word_start);
     change_selection(cx);
+}
+
+fn change_till_next_char(cx: &mut Context) {
+    will_find_char(
+        cx,
+        find_next_char_impl,
+        false,
+        true,
+        Some(Operation::Change),
+    );
+}
+
+fn change_till_prev_char(cx: &mut Context) {
+    will_find_char(
+        cx,
+        find_prev_char_impl,
+        false,
+        true,
+        Some(Operation::Change),
+    );
+}
+
+fn change_find_next_char(cx: &mut Context) {
+    will_find_char(cx, find_next_char_impl, true, true, Some(Operation::Change));
+}
+
+fn change_find_prev_char(cx: &mut Context) {
+    will_find_char(cx, find_prev_char_impl, true, true, Some(Operation::Change));
 }

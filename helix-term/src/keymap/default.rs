@@ -321,7 +321,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
 
         "esc" => exit_visual_line_mode,
 
-        "w" | "W" | "b" | "B" | "e" | "E" | "h" | "left" | "l" | "right" => no_op,
+        "w" | "W" | "b" | "B" | "e" | "E" | "t" | "T" | "f" | "F" | "h" | "left" | "l" | "right" => no_op,
     }));
     let insert = keymap!({ "Insert mode"
         "esc" => normal_mode,

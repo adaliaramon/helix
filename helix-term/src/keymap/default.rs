@@ -17,7 +17,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "F" => find_prev_char,
         "r" => replace,
         "R" => replace_with_yanked,
-        "A-." =>  repeat_last_motion,
+        ";" =>  repeat_last_motion,
 
         "~" => switch_case,
         "`" => switch_to_lowercase,
@@ -35,6 +35,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "E" => move_next_long_word_end,
 
         "v" => select_mode,
+        "V" => visual_line_mode,
         "G" => goto_line,
         "g" => { "Goto"
             "g" => goto_file_start,
@@ -77,7 +78,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "s" => select_regex,
         "A-s" => split_selection_on_newline,
         "S" => split_selection,
-        ";" => collapse_selection,
+        // ";" => collapse_selection,
         "A-;" => flip_selections,
         "A-k" | "A-up" => expand_selection,
         "A-j" | "A-down" => shrink_selection,
@@ -315,6 +316,12 @@ pub fn default() -> HashMap<Mode, Keymap> {
 
         "v" => normal_mode,
     }));
+    let visual_line = keymap!({ "Visual line mode"
+        "j" | "down" => extend_to_line_down_bounds,
+        "k" | "up" => extend_to_line_up_bounds,
+
+        "esc" => exit_visual_line_mode,
+    });
     let insert = keymap!({ "Insert mode"
         "esc" => normal_mode,
 
@@ -360,5 +367,6 @@ pub fn default() -> HashMap<Mode, Keymap> {
         Mode::Normal => Keymap::new(normal),
         Mode::Select => Keymap::new(select),
         Mode::Insert => Keymap::new(insert),
+        Mode::VisualLine => Keymap::new(visual_line),
     )
 }

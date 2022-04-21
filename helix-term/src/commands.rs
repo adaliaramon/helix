@@ -420,7 +420,10 @@ impl MappableCommand {
         record_macro, "Record macro",
         replay_macro, "Replay macro",
         command_palette, "Open command palette",
-    );
+        visual_line_mode, "Enter visual line mode",
+        exit_visual_line_mode, "Exit visual line mode",
+        extend_to_line_up_bounds, "Extend selection to line bounds (line-wise selection)",
+        extend_to_line_down_bounds, "Extend selection to line bounds (line-wise selection)",    );
 }
 
 impl fmt::Debug for MappableCommand {
@@ -878,6 +881,7 @@ where
         .clone()
         .transform(|range| move_fn(text, range, count));
     doc.set_selection(view.id, selection);
+    collapse_selection(cx);
 }
 
 fn move_next_word_start(cx: &mut Context) {
@@ -1119,7 +1123,7 @@ fn find_char_impl<F, M: CharMatcher + Clone + Copy>(
             if extend {
                 range.put_cursor(text, pos, true)
             } else {
-                Range::point(range.cursor(text)).put_cursor(text, pos, true)
+                Range::point(pos)
             }
         })
     });
@@ -1200,6 +1204,10 @@ fn repeat_last_motion(cx: &mut Context) {
     if let Some(m) = &last_motion {
         m.run(cx.editor);
         cx.editor.last_motion = last_motion;
+    }
+    let (_, doc) = current!(cx.editor);
+    if doc.mode == Mode::Normal {
+        collapse_selection(cx);
     }
 }
 
@@ -2362,6 +2370,8 @@ fn open_above(cx: &mut Context) {
 }
 
 fn normal_mode(cx: &mut Context) {
+    collapse_selection(cx);
+
     let (view, doc) = current!(cx.editor);
 
     if doc.mode == Mode::Normal {
@@ -2537,6 +2547,7 @@ fn exit_select_mode(cx: &mut Context) {
     let doc = doc_mut!(cx.editor);
     if doc.mode == Mode::Select {
         doc.mode = Mode::Normal;
+        collapse_selection(cx);
     }
 }
 
@@ -4534,4 +4545,28 @@ fn replay_macro(cx: &mut Context) {
             }
         }
     }));
+}
+
+fn visual_line_mode(cx: &mut Context) {
+    let (_, doc) = current!(cx.editor);
+    doc.mode = Mode::VisualLine;
+    extend_to_line_bounds(cx);
+}
+
+fn exit_visual_line_mode(cx: &mut Context) {
+    let doc = doc_mut!(cx.editor);
+    if doc.mode == Mode::VisualLine {
+        doc.mode = Mode::Normal;
+        collapse_selection(cx);
+    }
+}
+
+fn extend_to_line_up_bounds(cx: &mut Context) {
+    extend_line_up(cx);
+    extend_to_line_bounds(cx);
+}
+
+fn extend_to_line_down_bounds(cx: &mut Context) {
+    extend_line_down(cx);
+    extend_to_line_bounds(cx);
 }

@@ -5,7 +5,7 @@ use super::{Keymap, Mode};
 use helix_core::hashmap;
 
 pub fn default() -> HashMap<Mode, Keymap> {
-    let normal = keymap!({ "Normal mode"
+    let mut normal = keymap!({ "Normal mode"
         "h" | "left" => move_char_left,
         "j" | "down" => move_line_down,
         "k" | "up" => move_line_up,
@@ -364,6 +364,12 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "C-x" => completion,
         "C-r" => insert_register,
     });
+    normal.merge_nodes(keymap!({ "Normal mode"
+        "d" => { "Delete"
+            "a" => delete_textobject_around,
+            "i" => delete_textobject_inner,
+            },
+    }));
     hashmap!(
         Mode::Normal => Keymap::new(normal),
         Mode::Select => Keymap::new(select),

@@ -420,7 +420,10 @@ impl MappableCommand {
         visual_line_mode, "Enter visual line mode",
         exit_visual_line_mode, "Exit visual line mode",
         extend_to_line_up_bounds, "Extend selection to line bounds (line-wise selection)",
-        extend_to_line_down_bounds, "Extend selection to line bounds (line-wise selection)",    );
+        extend_to_line_down_bounds, "Extend selection to line bounds (line-wise selection)",
+        delete_textobject_around, "Delete around object",
+        delete_textobject_inner, "Delete inside object",
+    );
 }
 
 impl fmt::Debug for MappableCommand {
@@ -1943,6 +1946,17 @@ enum Operation {
     Delete,
     Change,
 }
+
+impl Clone for Operation {
+    fn clone(&self) -> Self {
+        match self {
+            Operation::Delete => Operation::Delete,
+            Operation::Change => Operation::Change,
+        }
+    }
+}
+
+impl Copy for Operation {}
 
 fn delete_selection_impl(cx: &mut Context, op: Operation) {
     let (view, doc) = current!(cx.editor);
@@ -4021,14 +4035,14 @@ fn goto_prev_comment(cx: &mut Context) {
 }
 
 fn select_textobject_around(cx: &mut Context) {
-    select_textobject(cx, textobject::TextObject::Around);
+    select_textobject(cx, textobject::TextObject::Around, None);
 }
 
 fn select_textobject_inner(cx: &mut Context) {
-    select_textobject(cx, textobject::TextObject::Inside);
+    select_textobject(cx, textobject::TextObject::Inside, None);
 }
 
-fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
+fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: Option<Operation>) {
     let count = cx.count();
 
     cx.on_next_key(move |cx, event| {
@@ -4083,12 +4097,20 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
             };
             textobject(cx.editor);
             cx.editor.last_motion = Some(Motion(Box::new(textobject)));
+
+            match action {
+                Some(Operation::Delete) => delete_selection(cx),
+                Some(Operation::Change) => change_selection(cx),
+                _ => (),
+            }
         }
     });
 
-    if let Some((title, abbrev)) = match objtype {
-        textobject::TextObject::Inside => Some(("Match inside", "mi")),
-        textobject::TextObject::Around => Some(("Match around", "ma")),
+    if let Some((title, abbrev)) = match (objtype, action) {
+        (textobject::TextObject::Inside, Some(Operation::Delete)) => Some(("Delete inside", "di")),
+        (textobject::TextObject::Around, Some(Operation::Delete)) => Some(("Delete around", "da")),
+        (textobject::TextObject::Inside, None) => Some(("Match inside", "mi")),
+        (textobject::TextObject::Around, None) => Some(("Match around", "ma")),
         _ => return,
     } {
         let help_text = [
@@ -4590,4 +4612,12 @@ fn extend_to_line_up_bounds(cx: &mut Context) {
 fn extend_to_line_down_bounds(cx: &mut Context) {
     extend_line_down(cx);
     extend_to_line_bounds(cx);
+}
+
+fn delete_textobject_around(cx: &mut Context) {
+    select_textobject(cx, textobject::TextObject::Around, Some(Operation::Delete));
+}
+
+fn delete_textobject_inner(cx: &mut Context) {
+    select_textobject(cx, textobject::TextObject::Inside, Some(Operation::Delete));
 }

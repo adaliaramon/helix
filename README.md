@@ -4,6 +4,10 @@ Fork of [helix](https://github.com/helix-editor/helix) with vim-like keybindings
 - Visual line mode
 - Action-Object workflow
 
+This branch also includes:
+- Running shell commands using `:sh` with `%` getting substituted by the current file
+- Diagnostics picker with `space + g/G`
+- Modified Monokai theme
 
 [![Build status](https://github.com/helix-editor/helix/actions/workflows/build.yml/badge.svg)](https://github.com/helix-editor/helix/actions)
 

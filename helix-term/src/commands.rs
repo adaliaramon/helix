@@ -423,8 +423,20 @@ impl MappableCommand {
         extend_to_line_down_bounds, "Extend selection to line bounds (line-wise selection)",
         delete_textobject_around, "Delete around object",
         delete_textobject_inner, "Delete inside object",
+        delete_word, "Delete word",
+        delete_long_word, "Delete long word",
+        delete_end_of_word, "Delete end of word",
+        delete_end_of_long_word, "Delete end of long word",
+        delete_beginning_of_word, "Delete beginning of word",
+        delete_beginning_of_long_word, "Delete beginning of long word",
         change_textobject_around, "Change around object",
         change_textobject_inner, "Change inside object",
+        change_word, "Change word",
+        change_long_word, "Change long word",
+        change_end_of_word, "Change end of word",
+        change_end_of_long_word, "Change end of long word",
+        change_beginning_of_word, "Change beginning of word",
+        change_beginning_of_long_word, "Change beginning of long word",
     );
 }
 
@@ -4626,10 +4638,70 @@ fn delete_textobject_inner(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Inside, Some(Operation::Delete));
 }
 
+fn delete_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_word_start);
+    delete_selection(cx);
+}
+
+fn delete_long_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_long_word_start);
+    delete_selection(cx);
+}
+
+fn delete_end_of_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_word_end);
+    delete_selection(cx);
+}
+
+fn delete_end_of_long_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_long_word_end);
+    delete_selection(cx);
+}
+
+fn delete_beginning_of_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_prev_word_start);
+    delete_selection(cx);
+}
+
+fn delete_beginning_of_long_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_prev_long_word_start);
+    delete_selection(cx);
+}
+
 fn change_textobject_around(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Around, Some(Operation::Change));
 }
 
 fn change_textobject_inner(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Inside, Some(Operation::Change));
+}
+
+fn change_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_word_start);
+    change_selection(cx);
+}
+
+fn change_long_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_long_word_start);
+    change_selection(cx);
+}
+
+fn change_end_of_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_word_end);
+    change_selection(cx);
+}
+
+fn change_end_of_long_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_long_word_end);
+    change_selection(cx);
+}
+
+fn change_beginning_of_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_prev_word_start);
+    change_selection(cx);
+}
+
+fn change_beginning_of_long_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_prev_long_word_start);
+    change_selection(cx);
 }

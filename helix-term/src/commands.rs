@@ -1960,6 +1960,7 @@ fn delete_selection_impl(cx: &mut Context, op: Operation) {
         Operation::Delete => {
             // exit select mode, if currently in select mode
             exit_select_mode(cx);
+            exit_visual_line_mode(cx);
         }
         Operation::Change => {
             enter_insert_mode(doc);

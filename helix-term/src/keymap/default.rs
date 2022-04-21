@@ -320,6 +320,11 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "j" | "down" => extend_to_line_down_bounds,
         "k" | "up" => extend_to_line_up_bounds,
 
+        "d" => delete_selection,
+        "A-d" => delete_selection_noyank,
+        "c" => change_selection,
+        "A-c" => change_selection_noyank,
+
         "esc" => exit_visual_line_mode,
     });
     let insert = keymap!({ "Insert mode"

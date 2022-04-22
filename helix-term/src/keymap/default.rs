@@ -400,6 +400,21 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "F" => change_find_prev_char,
             // "c" => change_line, // panics
             },
+        "y" => { "Yank"
+            "a" => yank_textobject_around,
+            "i" => yank_textobject_inner,
+            "w" => yank_word,
+            "W" => yank_long_word,
+            "e" => yank_end_of_word,
+            "E" => yank_end_of_long_word,
+            "b" => yank_beginning_of_word,
+            "B" => yank_beginning_of_long_word,
+            "t" => yank_till_next_char,
+            "T" => yank_till_prev_char,
+            "f" => yank_find_next_char,
+            "F" => yank_find_prev_char,
+            "y" => yank_line,
+            },
     }));
     hashmap!(
         Mode::Normal => Keymap::new(normal),

@@ -447,6 +447,19 @@ impl MappableCommand {
         change_find_next_char, "Change to next occurrence of char",
         change_find_prev_char, "Change to previous occurrence of char",
         change_line, "Change line",
+        yank_textobject_around, "Yank around object",
+        yank_textobject_inner, "Yank inside object",
+        yank_word, "Yank word",
+        yank_long_word, "Yank long word",
+        yank_end_of_word, "Yank end of word",
+        yank_end_of_long_word, "Yank end of long word",
+        yank_beginning_of_word, "Yank beginning of word",
+        yank_beginning_of_long_word, "Yank beginning of long word",
+        yank_till_next_char, "Yank till next occurrence of char",
+        yank_till_prev_char, "Yank till previous occurrence of char",
+        yank_find_next_char, "Yank to next occurrence of char",
+        yank_find_prev_char, "Yank to previous occurrence of char",
+        yank_line, "Yank line",
     );
 }
 
@@ -1134,6 +1147,7 @@ fn will_find_char<F>(
         match action {
             Some(Operation::Delete) => delete_selection(cx),
             Some(Operation::Change) => change_selection(cx),
+            Some(Operation::Yank) => yank(cx),
             None => (),
         }
     })
@@ -1979,6 +1993,7 @@ fn extend_to_line_bounds(cx: &mut Context) {
 enum Operation {
     Delete,
     Change,
+    Yank,
 }
 
 impl Clone for Operation {
@@ -1986,6 +2001,7 @@ impl Clone for Operation {
         match self {
             Operation::Delete => Operation::Delete,
             Operation::Change => Operation::Change,
+            Operation::Yank => Operation::Yank,
         }
     }
 }
@@ -2022,6 +2038,7 @@ fn delete_selection_impl(cx: &mut Context, op: Operation) {
         Operation::Change => {
             enter_insert_mode(doc);
         }
+        Operation::Yank => ()
     }
 }
 
@@ -4138,6 +4155,7 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: 
             match action {
                 Some(Operation::Delete) => delete_selection(cx),
                 Some(Operation::Change) => change_selection(cx),
+                Some(Operation::Yank) => yank(cx),
                 None => (),
             }
         }
@@ -4148,6 +4166,8 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: 
         (textobject::TextObject::Around, Some(Operation::Delete)) => Some(("Delete around", "da")),
         (textobject::TextObject::Inside, Some(Operation::Change)) => Some(("Change inside", "ci")),
         (textobject::TextObject::Around, Some(Operation::Change)) => Some(("Change around", "ca")),
+        (textobject::TextObject::Inside, Some(Operation::Yank)) => Some(("Yank inside", "yi")),
+        (textobject::TextObject::Around, Some(Operation::Yank)) => Some(("Yank around", "ya")),
         (textobject::TextObject::Inside, None) => Some(("Match inside", "mi")),
         (textobject::TextObject::Around, None) => Some(("Match around", "ma")),
         _ => return,
@@ -4793,4 +4813,75 @@ fn change_find_prev_char(cx: &mut Context) {
 fn change_line(cx: &mut Context) {
     extend_line(cx);
     change_selection(cx);
+}
+
+fn yank_textobject_around(cx: &mut Context) {
+    select_textobject(cx, textobject::TextObject::Around, Some(Operation::Yank));
+}
+
+fn yank_textobject_inner(cx: &mut Context) {
+    select_textobject(cx, textobject::TextObject::Inside, Some(Operation::Yank));
+}
+
+fn yank_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_word_start);
+    yank(cx);
+}
+
+fn yank_long_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_long_word_start);
+    yank(cx);
+}
+
+fn yank_end_of_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_word_end);
+    yank(cx);
+}
+
+fn yank_end_of_long_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_next_long_word_end);
+    yank(cx);
+}
+
+fn yank_beginning_of_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_prev_word_start);
+    yank(cx);
+}
+
+fn yank_beginning_of_long_word(cx: &mut Context) {
+    extend_word_impl(cx, movement::move_prev_long_word_start);
+    yank(cx);
+}
+
+fn yank_till_next_char(cx: &mut Context) {
+    will_find_char(
+        cx,
+        find_next_char_impl,
+        false,
+        true,
+        Some(Operation::Yank),
+    );
+}
+
+fn yank_till_prev_char(cx: &mut Context) {
+    will_find_char(
+        cx,
+        find_prev_char_impl,
+        false,
+        true,
+        Some(Operation::Yank),
+    );
+}
+
+fn yank_find_next_char(cx: &mut Context) {
+    will_find_char(cx, find_next_char_impl, true, true, Some(Operation::Yank));
+}
+
+fn yank_find_prev_char(cx: &mut Context) {
+    will_find_char(cx, find_prev_char_impl, true, true, Some(Operation::Yank));
+}
+
+fn yank_line(cx: &mut Context) {
+    extend_line(cx);
+    yank(cx);
 }

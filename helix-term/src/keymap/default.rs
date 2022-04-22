@@ -57,6 +57,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "p" => goto_previous_buffer,
             "." => goto_last_modification,
         },
+        "0" => goto_line_start,
+        "$" => goto_line_end,
         ":" => command_mode,
 
         "i" => insert_mode,
@@ -127,6 +129,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
 
         "u" => undo,
         "U" => redo,
+        "C-r" => redo,
         "A-u" => earlier,
         "A-U" => later,
 
@@ -167,6 +170,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "C-f" | "pagedown" => page_down,
         "C-u" => half_page_up,
         "C-d" => half_page_down,
+        "C-e" => scroll_down,
+        "C-y" => scroll_up,
 
         "C-w" => { "Window"
             "C-w" | "w" => rotate_view,
@@ -280,7 +285,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "A-|" => shell_pipe_to,
         "!" => shell_insert_output,
         "A-!" => shell_append_output,
-        "$" => shell_keep_pipe,
+        "A-$" => shell_keep_pipe,
         "C-z" => suspend,
 
         "C-a" => increment,

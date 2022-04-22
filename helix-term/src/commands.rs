@@ -2105,7 +2105,10 @@ fn collapse_selection_impl(view: &mut View, doc: &mut Document) {
 
 fn flip_selections(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
+    flip_selections_impl(view, doc);
+}
 
+fn flip_selections_impl(view: &mut View, doc: &mut Document) {
     let selection = doc
         .selection(view.id)
         .clone()
@@ -2466,8 +2469,6 @@ fn open_above(cx: &mut Context) {
 }
 
 fn normal_mode(cx: &mut Context) {
-    collapse_selection(cx);
-
     let (view, doc) = current!(cx.editor);
 
     if doc.mode == Mode::Normal {
@@ -2491,6 +2492,8 @@ fn normal_mode(cx: &mut Context) {
 
         doc.restore_cursor = false;
     }
+
+    collapse_selection(cx);
 }
 
 fn try_restore_indent(doc: &mut Document, view_id: ViewId) {
@@ -3071,6 +3074,7 @@ fn undo(cx: &mut Context) {
             cx.editor.set_status("Already at oldest change");
             break;
         }
+        flip_selections_impl(view, doc);
         collapse_selection_impl(view, doc);
     }
 }

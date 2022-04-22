@@ -2013,7 +2013,18 @@ impl Clone for Operation {
 impl Copy for Operation {}
 
 fn delete_selection_impl(cx: &mut Context, op: Operation) {
+    // How much to extend the count: the count minus 1
+    let count = cx.count.map_or(0, |v| v.get() - 1);
     let (view, doc) = current!(cx.editor);
+
+    // If in normal mode, extend the selection according to the provided count
+    if doc.mode == Mode::Normal && count > 0 {
+        let text = doc.text().slice(..);
+        let selection = doc.selection(view.id).clone().transform(|range| {
+            move_horizontally(text, range, Direction::Forward, count, Movement::Extend)
+        });
+        doc.set_selection(view.id, selection);
+    }
 
     let text = doc.text().slice(..);
     let selection = doc.selection(view.id);

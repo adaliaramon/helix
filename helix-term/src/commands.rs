@@ -1400,7 +1400,7 @@ pub fn scroll(cx: &mut Context, offset: usize, direction: Direction) {
     if line != cursor.row {
         let head = pos_at_coords(text, Position::new(line, cursor.col), true); // this func will properly truncate to line end
 
-        let anchor = if doc.mode == Mode::Select {
+        let anchor = if doc.mode == Mode::Select || doc.mode == Mode::VisualLine {
             range.anchor
         } else {
             head
@@ -1412,6 +1412,10 @@ pub fn scroll(cx: &mut Context, offset: usize, direction: Direction) {
         let idx = sel.primary_index();
         sel = sel.replace(idx, prim_sel);
         doc.set_selection(view.id, sel);
+    }
+
+    if doc.mode == Mode::VisualLine {
+        extend_to_line_bounds(cx);
     }
 }
 
@@ -2038,7 +2042,7 @@ fn delete_selection_impl(cx: &mut Context, op: Operation) {
         Operation::Change => {
             enter_insert_mode(doc);
         }
-        Operation::Yank => ()
+        Operation::Yank => (),
     }
 }
 
@@ -4854,23 +4858,11 @@ fn yank_beginning_of_long_word(cx: &mut Context) {
 }
 
 fn yank_till_next_char(cx: &mut Context) {
-    will_find_char(
-        cx,
-        find_next_char_impl,
-        false,
-        true,
-        Some(Operation::Yank),
-    );
+    will_find_char(cx, find_next_char_impl, false, true, Some(Operation::Yank));
 }
 
 fn yank_till_prev_char(cx: &mut Context) {
-    will_find_char(
-        cx,
-        find_prev_char_impl,
-        false,
-        true,
-        Some(Operation::Yank),
-    );
+    will_find_char(cx, find_prev_char_impl, false, true, Some(Operation::Yank));
 }
 
 fn yank_find_next_char(cx: &mut Context) {

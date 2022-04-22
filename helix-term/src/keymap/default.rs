@@ -88,7 +88,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "A-l" | "A-right" => select_next_sibling,
 
         "%" => select_all,
-        "x" => extend_line,
+        "x" => delete_selection,
         "X" => extend_to_line_bounds,
         // crop_to_whole_line
 

@@ -1403,7 +1403,7 @@ pub fn scroll(cx: &mut Context, offset: usize, direction: Direction) {
     if line != cursor.row {
         let head = pos_at_coords(text, Position::new(line, cursor.col), true); // this func will properly truncate to line end
 
-        let anchor = if doc.mode == Mode::Select {
+        let anchor = if doc.mode == Mode::Select || doc.mode == Mode::VisualLine {
             range.anchor
         } else {
             head
@@ -1415,6 +1415,10 @@ pub fn scroll(cx: &mut Context, offset: usize, direction: Direction) {
         let idx = sel.primary_index();
         sel = sel.replace(idx, prim_sel);
         doc.set_selection(view.id, sel);
+    }
+
+    if doc.mode == Mode::VisualLine {
+        extend_to_line_bounds(cx);
     }
 }
 
@@ -2012,7 +2016,18 @@ impl Clone for Operation {
 impl Copy for Operation {}
 
 fn delete_selection_impl(cx: &mut Context, op: Operation) {
+    // How much to extend the count: the count minus 1
+    let count = cx.count.map_or(0, |v| v.get() - 1);
     let (view, doc) = current!(cx.editor);
+
+    // If in normal mode, extend the selection according to the provided count
+    if doc.mode == Mode::Normal && count > 0 {
+        let text = doc.text().slice(..);
+        let selection = doc.selection(view.id).clone().transform(|range| {
+            move_horizontally(text, range, Direction::Forward, count, Movement::Extend)
+        });
+        doc.set_selection(view.id, selection);
+    }
 
     let text = doc.text().slice(..);
     let selection = doc.selection(view.id);
@@ -2041,7 +2056,7 @@ fn delete_selection_impl(cx: &mut Context, op: Operation) {
         Operation::Change => {
             enter_insert_mode(doc);
         }
-        Operation::Yank => ()
+        Operation::Yank => (),
     }
 }
 
@@ -2076,8 +2091,11 @@ fn change_selection_noyank(cx: &mut Context) {
 
 fn collapse_selection(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
-    let text = doc.text().slice(..);
+    collapse_selection_impl(view, doc);
+}
 
+fn collapse_selection_impl(view: &mut View, doc: &mut Document) {
+    let text = doc.text().slice(..);
     let selection = doc.selection(view.id).clone().transform(|range| {
         let pos = range.cursor(text);
         Range::new(pos, pos)
@@ -3053,6 +3071,7 @@ fn undo(cx: &mut Context) {
             cx.editor.set_status("Already at oldest change");
             break;
         }
+        collapse_selection_impl(view, doc);
     }
 }
 
@@ -4856,23 +4875,11 @@ fn yank_beginning_of_long_word(cx: &mut Context) {
 }
 
 fn yank_till_next_char(cx: &mut Context) {
-    will_find_char(
-        cx,
-        find_next_char_impl,
-        false,
-        true,
-        Some(Operation::Yank),
-    );
+    will_find_char(cx, find_next_char_impl, false, true, Some(Operation::Yank));
 }
 
 fn yank_till_prev_char(cx: &mut Context) {
-    will_find_char(
-        cx,
-        find_prev_char_impl,
-        false,
-        true,
-        Some(Operation::Yank),
-    );
+    will_find_char(cx, find_prev_char_impl, false, true, Some(Operation::Yank));
 }
 
 fn yank_find_next_char(cx: &mut Context) {

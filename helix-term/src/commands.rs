@@ -2467,8 +2467,6 @@ fn open_above(cx: &mut Context) {
 }
 
 fn normal_mode(cx: &mut Context) {
-    collapse_selection(cx);
-
     let (view, doc) = current!(cx.editor);
 
     if doc.mode == Mode::Normal {
@@ -2492,6 +2490,8 @@ fn normal_mode(cx: &mut Context) {
 
         doc.restore_cursor = false;
     }
+
+    collapse_selection(cx);
 }
 
 fn try_restore_indent(doc: &mut Document, view_id: ViewId) {

@@ -2496,7 +2496,10 @@ fn push_jump(editor: &mut Editor) {
 }
 
 fn goto_line(cx: &mut Context) {
-    goto_line_impl(cx.editor, cx.count);
+    match cx.count {
+        Some(_) => goto_line_impl(cx.editor, cx.count),
+        None => goto_last_line(cx),
+    }
     let (_, doc) = current!(cx.editor);
     if doc.mode == Mode::VisualLine {
         extend_to_line_bounds(cx);

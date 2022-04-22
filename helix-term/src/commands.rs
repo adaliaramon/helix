@@ -433,6 +433,7 @@ impl MappableCommand {
         delete_till_prev_char, "Delete till previous occurrence of char",
         delete_find_next_char, "Delete to next occurrence of char",
         delete_find_prev_char, "Delete to previous occurrence of char",
+        delete_line, "Delete line",
         change_textobject_around, "Change around object",
         change_textobject_inner, "Change inside object",
         change_word, "Change word",
@@ -445,6 +446,7 @@ impl MappableCommand {
         change_till_prev_char, "Change till previous occurrence of char",
         change_find_next_char, "Change to next occurrence of char",
         change_find_prev_char, "Change to previous occurrence of char",
+        change_line, "Change line",
     );
 }
 
@@ -4717,6 +4719,11 @@ fn delete_find_prev_char(cx: &mut Context) {
     will_find_char(cx, find_prev_char_impl, true, true, Some(Operation::Delete));
 }
 
+fn delete_line(cx: &mut Context) {
+    extend_line(cx);
+    delete_selection(cx);
+}
+
 fn change_textobject_around(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Around, Some(Operation::Change));
 }
@@ -4781,4 +4788,9 @@ fn change_find_next_char(cx: &mut Context) {
 
 fn change_find_prev_char(cx: &mut Context) {
     will_find_char(cx, find_prev_char_impl, true, true, Some(Operation::Change));
+}
+
+fn change_line(cx: &mut Context) {
+    extend_line(cx);
+    change_selection(cx);
 }

@@ -383,6 +383,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "T" => delete_till_prev_char,
             "f" => delete_find_next_char,
             "F" => delete_find_prev_char,
+            "d" => delete_line,
             },
         "c" => { "Change"
             "a" => change_textobject_around,
@@ -397,6 +398,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "T" => change_till_prev_char,
             "f" => change_find_next_char,
             "F" => change_find_prev_char,
+            // "c" => change_line, // panics
             },
     }));
     hashmap!(

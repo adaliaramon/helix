@@ -2102,7 +2102,10 @@ fn collapse_selection_impl(view: &mut View, doc: &mut Document) {
 
 fn flip_selections(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
+    flip_selections_impl(view, doc);
+}
 
+fn flip_selections_impl(view: &mut View, doc: &mut Document) {
     let selection = doc
         .selection(view.id)
         .clone()
@@ -3069,6 +3072,7 @@ fn undo(cx: &mut Context) {
             cx.editor.set_status("Already at oldest change");
             break;
         }
+        flip_selections_impl(view, doc);
         collapse_selection_impl(view, doc);
     }
 }

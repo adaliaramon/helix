@@ -2077,8 +2077,11 @@ fn change_selection_noyank(cx: &mut Context) {
 
 fn collapse_selection(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
-    let text = doc.text().slice(..);
+    collapse_selection_impl(view, doc);
+}
 
+fn collapse_selection_impl(view: &mut View, doc: &mut Document) {
+    let text = doc.text().slice(..);
     let selection = doc.selection(view.id).clone().transform(|range| {
         let pos = range.cursor(text);
         Range::new(pos, pos)
@@ -3055,6 +3058,7 @@ fn undo(cx: &mut Context) {
             cx.editor.set_status("Already at oldest change");
             break;
         }
+        collapse_selection_impl(view, doc);
     }
 }
 

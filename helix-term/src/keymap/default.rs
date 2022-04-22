@@ -57,6 +57,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "p" => goto_previous_buffer,
             "." => goto_last_modification,
         },
+        "0" => goto_line_start,
+        "$" => goto_line_end,
         ":" => command_mode,
 
         "i" => insert_mode,
@@ -127,6 +129,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
 
         "u" => undo,
         "U" => redo,
+        "C-r" => redo,
         "A-u" => earlier,
         "A-U" => later,
 
@@ -167,6 +170,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "C-f" | "pagedown" => page_down,
         "C-u" => half_page_up,
         "C-d" => half_page_down,
+        "C-e" => scroll_down,
+        "C-y" => scroll_up,
 
         "C-w" => { "Window"
             "C-w" | "w" => rotate_view,
@@ -282,7 +287,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "A-|" => shell_pipe_to,
         "!" => shell_insert_output,
         "A-!" => shell_append_output,
-        "$" => shell_keep_pipe,
+        "A-$" => shell_keep_pipe,
         "C-z" => suspend,
 
         "C-a" => increment,
@@ -380,6 +385,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "T" => delete_till_prev_char,
             "f" => delete_find_next_char,
             "F" => delete_find_prev_char,
+            "d" => delete_line,
             },
         "c" => { "Change"
             "a" => change_textobject_around,
@@ -394,6 +400,22 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "T" => change_till_prev_char,
             "f" => change_find_next_char,
             "F" => change_find_prev_char,
+            // "c" => change_line, // panics
+            },
+        "y" => { "Yank"
+            "a" => yank_textobject_around,
+            "i" => yank_textobject_inner,
+            "w" => yank_word,
+            "W" => yank_long_word,
+            "e" => yank_end_of_word,
+            "E" => yank_end_of_long_word,
+            "b" => yank_beginning_of_word,
+            "B" => yank_beginning_of_long_word,
+            "t" => yank_till_next_char,
+            "T" => yank_till_prev_char,
+            "f" => yank_find_next_char,
+            "F" => yank_find_prev_char,
+            "y" => yank_line,
             },
     }));
     hashmap!(

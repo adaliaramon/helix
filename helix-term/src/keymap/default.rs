@@ -388,8 +388,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "c" => { "Change"
             "a" => change_textobject_around,
             "i" => change_textobject_inner,
-            "w" => change_word,
-            "W" => change_long_word,
+            "w" => change_end_of_word,
+            "W" => change_end_of_long_word,
             "e" => change_end_of_word,
             "E" => change_end_of_long_word,
             "b" => change_beginning_of_word,
@@ -403,8 +403,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "y" => { "Yank"
             "a" => yank_textobject_around,
             "i" => yank_textobject_inner,
-            "w" => yank_word,
-            "W" => yank_long_word,
+            "w" => yank_end_of_word,
+            "W" => yank_end_of_long_word,
             "e" => yank_end_of_word,
             "E" => yank_end_of_long_word,
             "b" => yank_beginning_of_word,

@@ -107,7 +107,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "c" => goto_prev_class,
             "a" => goto_prev_parameter,
             "o" => goto_prev_comment,
-            "p" => move_prev_paragraph,
+            "p" => goto_prev_paragraph,
             "space" => add_newline_above,
         },
         "]" => { "Right bracket"
@@ -117,7 +117,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "c" => goto_next_class,
             "a" => goto_next_parameter,
             "o" => goto_next_comment,
-            "p" => move_next_paragraph,
+            "p" => goto_next_paragraph,
             "space" => add_newline_below,
         },
 
@@ -390,8 +390,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "c" => { "Change"
             "a" => change_textobject_around,
             "i" => change_textobject_inner,
-            "w" => change_word,
-            "W" => change_long_word,
+            "w" => change_end_of_word,
+            "W" => change_end_of_long_word,
             "e" => change_end_of_word,
             "E" => change_end_of_long_word,
             "b" => change_beginning_of_word,
@@ -405,8 +405,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "y" => { "Yank"
             "a" => yank_textobject_around,
             "i" => yank_textobject_inner,
-            "w" => yank_word,
-            "W" => yank_long_word,
+            "w" => yank_end_of_word,
+            "W" => yank_end_of_long_word,
             "e" => yank_end_of_word,
             "E" => yank_end_of_long_word,
             "b" => yank_beginning_of_word,

@@ -3153,6 +3153,7 @@ fn yank(cx: &mut Context) {
 
     cx.editor.set_status(msg);
     normal_mode(cx);
+    collapse_selection(cx);
 }
 
 fn yank_joined_to_clipboard_impl(

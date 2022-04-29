@@ -103,6 +103,10 @@ pub fn move_next_long_word_start(slice: RopeSlice, range: Range, count: usize) -
     word_move(slice, range, count, WordMotionTarget::NextLongWordStart)
 }
 
+pub fn move_next_long_word_start_vim(slice: RopeSlice, range: Range, count: usize) -> Range {
+    word_move(slice, range, count, WordMotionTarget::NextLongWordStartVim)
+}
+
 pub fn move_next_long_word_end(slice: RopeSlice, range: Range, count: usize) -> Range {
     word_move(slice, range, count, WordMotionTarget::NextLongWordEnd)
 }
@@ -282,6 +286,7 @@ pub enum WordMotionTarget {
     // delimited by whitespace, and can consist of punctuation as well
     // as alphanumerics.
     NextLongWordStart,
+    NextLongWordStartVim,
     NextLongWordEnd,
     PrevLongWordStart,
 }
@@ -415,6 +420,10 @@ fn reached_target(
         }
         WordMotionTarget::NextWordStartVim => {
             is_word_boundary(prev_ch, prev_prev_ch.unwrap_or(next_ch))
+                && (char_is_line_ending(next_ch) || !prev_ch.is_whitespace())
+        }
+        WordMotionTarget::NextLongWordStartVim => {
+            is_long_word_boundary(prev_ch, prev_prev_ch.unwrap_or(next_ch))
                 && (char_is_line_ending(next_ch) || !prev_ch.is_whitespace())
         }
     }

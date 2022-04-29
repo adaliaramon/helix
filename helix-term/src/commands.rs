@@ -958,7 +958,7 @@ fn move_next_word_end(cx: &mut Context) {
 }
 
 fn move_next_long_word_start(cx: &mut Context) {
-    move_word_impl(cx, movement::move_next_long_word_start)
+    move_word_impl(cx, movement::move_next_long_word_start_vim)
 }
 
 fn move_prev_long_word_start(cx: &mut Context) {

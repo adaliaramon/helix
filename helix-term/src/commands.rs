@@ -939,7 +939,7 @@ where
 }
 
 fn move_next_word_start(cx: &mut Context) {
-    move_word_impl(cx, movement::move_next_word_start)
+    move_word_impl(cx, movement::move_next_word_start_vim)
 }
 
 fn move_prev_word_start(cx: &mut Context) {

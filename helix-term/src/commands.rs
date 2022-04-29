@@ -2144,6 +2144,20 @@ fn ensure_selections_forward(cx: &mut Context) {
     doc.set_selection(view.id, selection);
 }
 
+fn ensure_selections_backwards(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+
+    let selection = doc
+        .selection(view.id)
+        .clone()
+        .transform(|r| match r.direction() {
+            Direction::Forward => r.flip(),
+            Direction::Backward => r,
+        });
+
+    doc.set_selection(view.id, selection);
+}
+
 fn enter_insert_mode(doc: &mut Document) {
     doc.mode = Mode::Insert;
 }
@@ -4185,7 +4199,10 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: 
             match action {
                 Some(Operation::Delete) => delete_selection(cx),
                 Some(Operation::Change) => change_selection(cx),
-                Some(Operation::Yank) => yank(cx),
+                Some(Operation::Yank) => {
+                    ensure_selections_backwards(cx);
+                    yank(cx)
+                }
                 None => (),
             }
         }

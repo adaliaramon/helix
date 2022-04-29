@@ -87,6 +87,10 @@ pub fn move_next_word_start(slice: RopeSlice, range: Range, count: usize) -> Ran
     word_move(slice, range, count, WordMotionTarget::NextWordStart)
 }
 
+pub fn move_next_word_start_vim(slice: RopeSlice, range: Range, count: usize) -> Range {
+    word_move(slice, range, count, WordMotionTarget::NextWordStartVim)
+}
+
 pub fn move_next_word_end(slice: RopeSlice, range: Range, count: usize) -> Range {
     word_move(slice, range, count, WordMotionTarget::NextWordEnd)
 }
@@ -270,6 +274,7 @@ where
 #[derive(Copy, Clone, Debug)]
 pub enum WordMotionTarget {
     NextWordStart,
+    NextWordStartVim,
     NextWordEnd,
     PrevWordStart,
     PrevWordEnd,
@@ -320,6 +325,18 @@ impl CharHelpers for Chars<'_> {
             ch
         };
 
+        let mut prev_prev_ch = {
+            let mut ch = self.prev();
+            if let Some(_) = ch {
+                ch = self.prev();
+                if ch.is_some() {
+                    self.next();
+                }
+                self.next();
+            }
+            ch
+        };
+
         // Skip any initial newline characters.
         while let Some(ch) = self.next() {
             if char_is_line_ending(ch) {
@@ -338,13 +355,15 @@ impl CharHelpers for Chars<'_> {
         let head_start = head;
         #[allow(clippy::while_let_on_iterator)] // Clippy's suggestion to fix doesn't work here.
         while let Some(next_ch) = self.next() {
-            if prev_ch.is_none() || reached_target(target, prev_ch.unwrap(), next_ch) {
+            if prev_ch.is_none() || reached_target(target, prev_ch.unwrap(), next_ch, prev_prev_ch)
+            {
                 if head == head_start {
                     anchor = head;
                 } else {
                     break;
                 }
             }
+            prev_prev_ch = prev_ch;
             prev_ch = Some(next_ch);
             advance(&mut head);
         }
@@ -371,7 +390,12 @@ fn is_long_word_boundary(a: char, b: char) -> bool {
     }
 }
 
-fn reached_target(target: WordMotionTarget, prev_ch: char, next_ch: char) -> bool {
+fn reached_target(
+    target: WordMotionTarget,
+    prev_ch: char,
+    next_ch: char,
+    prev_prev_ch: Option<char>,
+) -> bool {
     match target {
         WordMotionTarget::NextWordStart | WordMotionTarget::PrevWordEnd => {
             is_word_boundary(prev_ch, next_ch)
@@ -388,6 +412,10 @@ fn reached_target(target: WordMotionTarget, prev_ch: char, next_ch: char) -> boo
         WordMotionTarget::NextLongWordEnd | WordMotionTarget::PrevLongWordStart => {
             is_long_word_boundary(prev_ch, next_ch)
                 && (!prev_ch.is_whitespace() || char_is_line_ending(next_ch))
+        }
+        WordMotionTarget::NextWordStartVim => {
+            is_word_boundary(prev_ch, prev_prev_ch.unwrap_or(next_ch))
+                && (char_is_line_ending(next_ch) || !prev_ch.is_whitespace())
         }
     }
 }

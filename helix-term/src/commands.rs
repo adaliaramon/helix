@@ -329,6 +329,10 @@ impl MappableCommand {
         delete_word_forward, "Delete next word",
         kill_to_line_start, "Delete content till the start of the line",
         kill_to_line_end, "Delete content till the end of the line",
+        change_to_line_start, "Change content till the start of the line",
+        change_to_line_end, "Change content till the end of the line",
+        yank_to_line_start, "Yank content till the start of the line",
+        yank_to_line_end, "Yank content till the end of the line",
         undo, "Undo change",
         redo, "Redo change",
         earlier, "Move backward in history",
@@ -734,9 +738,12 @@ fn extend_to_line_start(cx: &mut Context) {
 }
 
 fn kill_to_line_start(cx: &mut Context) {
+    kill_to_line_start_impl(cx, Operation::Delete);
+}
+
+fn kill_to_line_start_impl(cx: &mut Context, operation: Operation) {
     let (view, doc) = current!(cx.editor);
     let text = doc.text().slice(..);
-
     let selection = doc.selection(view.id).clone().transform(|range| {
         let line = range.cursor_line(text);
         let first_char = text.line_to_char(line);
@@ -758,13 +765,25 @@ fn kill_to_line_start(cx: &mut Context) {
         };
         Range::new(head, anchor)
     });
-    delete_selection_insert_mode(doc, view, &selection);
+    if doc.mode == Mode::Insert {
+        delete_selection_insert_mode(doc, view, &selection);
+    } else {
+        doc.set_selection(view.id, selection);
+        match operation {
+            Operation::Yank => yank(cx),
+            Operation::Delete => delete_selection(cx),
+            Operation::Change => change_selection(cx),
+        }
+    }
 }
 
 fn kill_to_line_end(cx: &mut Context) {
+    kill_to_line_end_impl(cx, Operation::Delete);
+}
+
+fn kill_to_line_end_impl(cx: &mut Context, operation: Operation) {
     let (view, doc) = current!(cx.editor);
     let text = doc.text().slice(..);
-
     let selection = doc.selection(view.id).clone().transform(|range| {
         let line = range.cursor_line(text);
         let line_end_pos = line_end_char_index(&text, line);
@@ -777,7 +796,36 @@ fn kill_to_line_end(cx: &mut Context) {
         }
         new_range
     });
-    delete_selection_insert_mode(doc, view, &selection);
+    if doc.mode == Mode::Insert {
+        delete_selection_insert_mode(doc, view, &selection);
+    } else {
+        doc.set_selection(view.id, selection);
+        match operation {
+            Operation::Yank => yank(cx),
+            Operation::Delete => delete_selection(cx),
+            Operation::Change => change_selection(cx),
+        }
+    }
+}
+
+fn change_to_line_start(cx: &mut Context) {
+    kill_to_line_start_impl(cx, Operation::Change);
+}
+
+fn change_to_line_end(cx: &mut Context) {
+    kill_to_line_end_impl(cx, Operation::Change);
+}
+
+fn yank_to_line_start(cx: &mut Context) {
+    let selection = cx.selection();
+    kill_to_line_start_impl(cx, Operation::Yank);
+    cx.set_selection(selection);
+}
+
+fn yank_to_line_end(cx: &mut Context) {
+    let selection = cx.selection();
+    kill_to_line_end_impl(cx, Operation::Yank);
+    cx.set_selection(selection);
 }
 
 fn goto_first_nonwhitespace(cx: &mut Context) {

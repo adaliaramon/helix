@@ -117,6 +117,18 @@ impl<'a> Context<'a> {
     pub fn count(&self) -> usize {
         self.count.map_or(1, |v| v.get())
     }
+
+    #[inline]
+    pub fn selection(&mut self) -> Selection {
+        let (view, doc) = current!(self.editor);
+        doc.selection(view.id).clone()
+    }
+
+    #[inline]
+    pub fn set_selection(&mut self, selection: Selection) {
+        let (view, doc) = current!(self.editor);
+        doc.set_selection(view.id, selection);
+    }
 }
 
 use helix_view::{align_view, Align};
@@ -2144,20 +2156,6 @@ fn ensure_selections_forward(cx: &mut Context) {
     doc.set_selection(view.id, selection);
 }
 
-fn ensure_selections_backwards(cx: &mut Context) {
-    let (view, doc) = current!(cx.editor);
-
-    let selection = doc
-        .selection(view.id)
-        .clone()
-        .transform(|r| match r.direction() {
-            Direction::Forward => r.flip(),
-            Direction::Backward => r,
-        });
-
-    doc.set_selection(view.id, selection);
-}
-
 fn enter_insert_mode(doc: &mut Document) {
     doc.mode = Mode::Insert;
 }
@@ -4149,6 +4147,7 @@ fn select_textobject_inner(cx: &mut Context) {
 
 fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: Option<Operation>) {
     let count = cx.count();
+    let current_selection = cx.selection();
 
     cx.on_next_key(move |cx, event| {
         cx.editor.autoinfo = None;
@@ -4200,8 +4199,8 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: 
                 Some(Operation::Delete) => delete_selection(cx),
                 Some(Operation::Change) => change_selection(cx),
                 Some(Operation::Yank) => {
-                    ensure_selections_backwards(cx);
-                    yank(cx)
+                    yank(cx);
+                    cx.set_selection(current_selection)
                 }
                 None => (),
             }

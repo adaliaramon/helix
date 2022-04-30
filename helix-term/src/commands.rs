@@ -4936,6 +4936,8 @@ fn yank_find_prev_char(cx: &mut Context) {
 }
 
 fn yank_line(cx: &mut Context) {
+    let selection = cx.selection();
     extend_line(cx);
     yank(cx);
+    cx.set_selection(selection);
 }

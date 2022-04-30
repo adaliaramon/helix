@@ -72,6 +72,7 @@ pub fn default() -> HashMap<Mode, Keymap> {
         "A-d" => delete_selection_noyank,
         "c" => change_selection,
         "A-c" => change_selection_noyank,
+        "D" => kill_to_line_end,
 
         "C" => copy_selection_on_next_line,
         "A-C" => copy_selection_on_prev_line,
@@ -384,6 +385,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "f" => delete_find_next_char,
             "F" => delete_find_prev_char,
             "d" => delete_line,
+            "0" => kill_to_line_start,
+            "$" => kill_to_line_end,
             },
         "c" => { "Change"
             "a" => change_textobject_around,
@@ -399,6 +402,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "f" => change_find_next_char,
             "F" => change_find_prev_char,
             // "c" => change_line, // panics
+            "0" => change_to_line_start,
+            "$" => change_to_line_end,
             },
         "y" => { "Yank"
             "a" => yank_textobject_around,
@@ -414,6 +419,8 @@ pub fn default() -> HashMap<Mode, Keymap> {
             "f" => yank_find_next_char,
             "F" => yank_find_prev_char,
             "y" => yank_line,
+            "0" => yank_to_line_start,
+            "$" => yank_to_line_end,
             },
     }));
     hashmap!(

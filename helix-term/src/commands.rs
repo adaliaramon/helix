@@ -118,6 +118,18 @@ impl<'a> Context<'a> {
     pub fn count(&self) -> usize {
         self.count.map_or(1, |v| v.get())
     }
+
+    #[inline]
+    pub fn selection(&mut self) -> Selection {
+        let (view, doc) = current!(self.editor);
+        doc.selection(view.id).clone()
+    }
+
+    #[inline]
+    pub fn set_selection(&mut self, selection: Selection) {
+        let (view, doc) = current!(self.editor);
+        doc.set_selection(view.id, selection);
+    }
 }
 
 use helix_view::{align_view, Align};
@@ -3155,6 +3167,7 @@ fn yank(cx: &mut Context) {
 
     cx.editor.set_status(msg);
     normal_mode(cx);
+    collapse_selection(cx);
 }
 
 fn yank_joined_to_clipboard_impl(
@@ -4136,6 +4149,7 @@ fn select_textobject_inner(cx: &mut Context) {
 
 fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: Option<Operation>) {
     let count = cx.count();
+    let current_selection = cx.selection();
 
     cx.on_next_key(move |cx, event| {
         cx.editor.autoinfo = None;
@@ -4186,7 +4200,10 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject, action: 
             match action {
                 Some(Operation::Delete) => delete_selection(cx),
                 Some(Operation::Change) => change_selection(cx),
-                Some(Operation::Yank) => yank(cx),
+                Some(Operation::Yank) => {
+                    yank(cx);
+                    cx.set_selection(current_selection)
+                }
                 None => (),
             }
         }
@@ -4706,6 +4723,10 @@ fn extend_to_line_down_bounds(cx: &mut Context) {
     extend_to_line_bounds(cx);
 }
 
+fn reset_count(cx: &mut Context) {
+    cx.count = None;
+}
+
 fn delete_textobject_around(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Around, Some(Operation::Delete));
 }
@@ -4716,31 +4737,37 @@ fn delete_textobject_inner(cx: &mut Context) {
 
 fn delete_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_word_start);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_long_word_start);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_end_of_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_word_end);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_end_of_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_long_word_end);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_beginning_of_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_prev_word_start);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_beginning_of_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_prev_long_word_start);
+    reset_count(cx);
     delete_selection(cx);
 }
 
@@ -4774,6 +4801,7 @@ fn delete_find_prev_char(cx: &mut Context) {
 
 fn delete_line(cx: &mut Context) {
     extend_line(cx);
+    reset_count(cx);
     delete_selection(cx);
 }
 
@@ -4787,31 +4815,37 @@ fn change_textobject_inner(cx: &mut Context) {
 
 fn change_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_word_start);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_long_word_start);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_end_of_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_word_end);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_end_of_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_long_word_end);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_beginning_of_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_prev_word_start);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_beginning_of_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_prev_long_word_start);
+    reset_count(cx);
     change_selection(cx);
 }
 
@@ -4845,6 +4879,7 @@ fn change_find_prev_char(cx: &mut Context) {
 
 fn change_line(cx: &mut Context) {
     extend_line(cx);
+    reset_count(cx);
     change_selection(cx);
 }
 

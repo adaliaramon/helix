@@ -2165,18 +2165,7 @@ fn append_mode(cx: &mut Context) {
     enter_insert_mode(doc);
     doc.restore_cursor = true;
     let text = doc.text().slice(..);
-
-    // Make sure there's room at the end of the document if the last
-    // selection butts up against it.
-    let end = text.len_chars();
-    let last_range = doc.selection(view.id).iter().last().unwrap();
-    if !last_range.is_empty() && last_range.head == end {
-        let transaction = Transaction::change(
-            doc.text(),
-            [(end, end, Some(doc.line_ending.as_str().into()))].into_iter(),
-        );
-        doc.apply(&transaction, view.id);
-    }
+    let current_line = doc.selection(view.id).primary().cursor_line(text.slice(..));
 
     let selection = doc.selection(view.id).clone().transform(|range| {
         Range::new(
@@ -2184,7 +2173,9 @@ fn append_mode(cx: &mut Context) {
             graphemes::next_grapheme_boundary(doc.text().slice(..), range.to()),
         )
     });
-    doc.set_selection(view.id, selection);
+    if selection.primary().cursor_line(doc.text().slice(..)) == current_line {
+        doc.set_selection(view.id, selection);
+    }
     collapse_selection(cx);
 }
 

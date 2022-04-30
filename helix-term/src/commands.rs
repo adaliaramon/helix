@@ -4722,6 +4722,10 @@ fn extend_to_line_down_bounds(cx: &mut Context) {
     extend_to_line_bounds(cx);
 }
 
+fn reset_count(cx: &mut Context) {
+    cx.count = None;
+}
+
 fn delete_textobject_around(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Around, Some(Operation::Delete));
 }
@@ -4732,31 +4736,37 @@ fn delete_textobject_inner(cx: &mut Context) {
 
 fn delete_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_word_start);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_long_word_start);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_end_of_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_word_end);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_end_of_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_long_word_end);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_beginning_of_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_prev_word_start);
+    reset_count(cx);
     delete_selection(cx);
 }
 
 fn delete_beginning_of_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_prev_long_word_start);
+    reset_count(cx);
     delete_selection(cx);
 }
 
@@ -4790,6 +4800,7 @@ fn delete_find_prev_char(cx: &mut Context) {
 
 fn delete_line(cx: &mut Context) {
     extend_line(cx);
+    reset_count(cx);
     delete_selection(cx);
 }
 
@@ -4803,31 +4814,37 @@ fn change_textobject_inner(cx: &mut Context) {
 
 fn change_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_word_start);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_long_word_start);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_end_of_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_word_end);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_end_of_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_next_long_word_end);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_beginning_of_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_prev_word_start);
+    reset_count(cx);
     change_selection(cx);
 }
 
 fn change_beginning_of_long_word(cx: &mut Context) {
     extend_word_impl(cx, movement::move_prev_long_word_start);
+    reset_count(cx);
     change_selection(cx);
 }
 
@@ -4861,6 +4878,7 @@ fn change_find_prev_char(cx: &mut Context) {
 
 fn change_line(cx: &mut Context) {
     extend_line(cx);
+    reset_count(cx);
     change_selection(cx);
 }
 

@@ -332,7 +332,7 @@ impl CharHelpers for Chars<'_> {
 
         let mut prev_prev_ch = {
             let mut ch = self.prev();
-            if let Some(_) = ch {
+            if ch.is_some() {
                 ch = self.prev();
                 if ch.is_some() {
                     self.next();

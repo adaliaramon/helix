@@ -59,8 +59,10 @@
 | `:get-option`, `:get` | Get the current value of a config option. |
 | `:sort` | Sort ranges in selection. |
 | `:rsort` | Sort ranges in selection in reverse order. |
+| `:reflow` | Hard-wrap the current selection of lines to a given width. |
 | `:tree-sitter-subtree`, `:ts-subtree` | Display tree sitter subtree under cursor, primarily for debugging queries. |
 | `:config-reload` | Refreshes helix's config. |
 | `:config-open` | Open the helix config.toml file. |
 | `:run-shell-command`, `:sh` | Run a shell command |
 | `:pipe` | Pipe each selection to the shell command. |
+| `:run-shell-command`, `:sh` | Run a shell command |

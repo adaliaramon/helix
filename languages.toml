@@ -303,7 +303,7 @@ source = { git = "https://github.com/omertuc/tree-sitter-go-work", rev = "6dd9dd
 name = "javascript"
 scope = "source.js"
 injection-regex = "^(js|javascript)$"
-file-types = ["js", "jsx", "mjs"]
+file-types = ["js", "jsx", "mjs", "cjs"]
 shebangs = ["node"]
 roots = []
 comment-token = "//"
@@ -748,7 +748,7 @@ source = { git = "https://github.com/theHamsta/tree-sitter-glsl", rev = "88408ff
 [[language]]
 name = "perl"
 scope = "source.perl"
-file-types = ["pl", "pm"]
+file-types = ["pl", "pm", "t"]
 shebangs = ["perl"]
 roots = []
 comment-token = "#"
@@ -955,6 +955,32 @@ indent = { tab-width = 4, unit = "\t" }
 [[grammar]]
 name = "git-config"
 source = { git = "https://github.com/the-mikedavis/tree-sitter-git-config", rev = "0e4f0baf90b57e5aeb62dcdbf03062c6315d43ea" }
+
+[[language]]
+name = "git-attributes"
+scope = "source.gitattributes"
+roots = []
+file-types = [".gitattributes"]
+injection-regex = "git-attributes"
+comment-token = "#"
+grammar = "gitattributes"
+
+[[grammar]]
+name = "gitattributes"
+source = { git = "https://github.com/mtoohey31/tree-sitter-gitattributes", rev = "3dd50808e3096f93dccd5e9dc7dc3dba2eb12dc4" }
+
+[[language]]
+name = "git-ignore"
+scope = "source.gitignore"
+roots = []
+file-types = [".gitignore", ".gitignore_global"]
+injection-regex = "git-ignore"
+comment-token = "#"
+grammar = "gitignore"
+
+[[grammar]]
+name = "gitignore"
+source = { git = "https://github.com/shunsambongi/tree-sitter-gitignore", rev = "f4685bf11ac466dd278449bcfe5fd014e94aa504" }
 
 [[language]]
 name = "graphql"
@@ -1303,3 +1329,16 @@ indent = { tab-width = 2, unit = "  " }
 [[grammar]]
 name = "cpon"
 source = { git = "https://github.com/fvacek/tree-sitter-cpon", rev = "11ba46a4de3eb86934003133099c9963a60f9687" }
+
+[[language]]
+name = "odin"
+auto-format = false
+scope = "source.odin"
+file-types = ["odin"]
+roots = []
+comment-token = "//"
+indent = { tab-width = 4, unit = "  " }
+
+[[grammar]]
+name = "odin"
+source = { git = "https://github.com/MineBill/tree-sitter-odin", rev = "da885f4a387f169b9b69fe0968259ee257a8f69a" }

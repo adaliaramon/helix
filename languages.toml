@@ -605,9 +605,10 @@ name = "lua"
 scope = "source.lua"
 file-types = ["lua"]
 shebangs = ["lua"]
-roots = []
+roots = [".luarc.json", ".luacheckrc", ".stylua.toml", "selene.toml", ".git"]
 comment-token = "--"
 indent = { tab-width = 2, unit = "  " }
+language-server = { command = "lua-language-server", args = [] }
 
 [[grammar]]
 name = "lua"
@@ -1048,7 +1049,7 @@ language-server = { command = "erlang_ls" }
 
 [[grammar]]
 name = "erlang"
-source = { git = "https://github.com/the-mikedavis/tree-sitter-erlang", rev = "3f611cfdc790214c3f9f9cf1658b3ae8039c54b8" }
+source = { git = "https://github.com/the-mikedavis/tree-sitter-erlang", rev = "6cd8f956ada445b277de1581b5328ae8e8be9aac" }
 
 [[language]]
 name = "kotlin"
@@ -1126,7 +1127,7 @@ indent = { tab-width = 2, unit = "  " }
 
 [[grammar]]
 name = "gleam"
-source = { git = "https://github.com/gleam-lang/tree-sitter-gleam", rev = "7159ce961592192b0e7cdf88782cda0fdf41a4cb" }
+source = { git = "https://github.com/gleam-lang/tree-sitter-gleam", rev = "d7861b2a4b4d594c58bb4f1be5f1f4ee4c67e5c3" }
 
 [[language]]
 name = "ron"
@@ -1379,3 +1380,32 @@ indent = { tab-width = 2, unit = "  " }
 [[grammar]]
 name = "scheme"
 source = { git = "https://github.com/6cdh/tree-sitter-scheme", rev = "27fb77db05f890c2823b4bd751c6420378df146b" }
+
+[[language]]
+name = "v"
+scope = "source.v"
+file-types = ["v", "vv"]
+shebangs = ["v run"]
+roots = ["v.mod"]
+language-server = { command = "vls", args = [] }
+auto-format = true
+comment-token = "//"
+indent = { tab-width = 4, unit = "\t" }
+
+[[grammar]]
+name = "v"
+source = { git = "https://github.com/vlang/vls", subpath = "tree_sitter_v", rev = "3e8124ea4ab80aa08ec77f03df53f577902a0cdd" }
+
+[[language]]
+name = "verilog"
+scope = "source.verilog"
+file-types = ["v", "sv", "svh"]
+roots = []
+comment-token = "//"
+language-server = { command = "svlangserver", args = [] }
+indent = { tab-width = 2, unit = "  " }
+injection-regex = "verilog"
+
+[[grammar]]
+name = "verilog"
+source = { git = "https://github.com/andreytkachenko/tree-sitter-verilog", rev = "514d8d70593d29ef3ef667fa6b0e504ae7c977e3" }

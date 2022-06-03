@@ -1049,7 +1049,7 @@ language-server = { command = "erlang_ls" }
 
 [[grammar]]
 name = "erlang"
-source = { git = "https://github.com/the-mikedavis/tree-sitter-erlang", rev = "6cd8f956ada445b277de1581b5328ae8e8be9aac" }
+source = { git = "https://github.com/the-mikedavis/tree-sitter-erlang", rev = "481e7f8ddf27f07a47d1531b6e2b154b89ece31d" }
 
 [[language]]
 name = "kotlin"
@@ -1330,7 +1330,7 @@ indent = { tab-width = 2, unit = "  " }
 
 [[grammar]]
 name = "cpon"
-source = { git = "https://github.com/fvacek/tree-sitter-cpon", rev = "cc6a22b1fa8917c2d041af399f19f34a0a9d94ff" }
+source = { git = "https://github.com/fvacek/tree-sitter-cpon", rev = "0d01fcdae5a53191df5b1349f9bce053833270e7" }
 
 [[language]]
 name = "odin"
@@ -1409,3 +1409,27 @@ injection-regex = "verilog"
 [[grammar]]
 name = "verilog"
 source = { git = "https://github.com/andreytkachenko/tree-sitter-verilog", rev = "514d8d70593d29ef3ef667fa6b0e504ae7c977e3" }
+
+[[language]]
+name = "edoc"
+scope = "source.edoc"
+file-types = ["edoc", "edoc.in"]
+injection-regex = "edoc"
+roots = []
+indent = { tab-width = 4, unit = "    " }
+
+[[grammar]]
+name = "edoc"
+source = { git = "https://github.com/the-mikedavis/tree-sitter-edoc", rev = "1691ec0aa7ad1ed9fa295590545f27e570d12d60" }
+
+[[language]]
+name = "jsdoc"
+scope = "source.jsdoc"
+injection-regex = "jsdoc"
+file-types = ["jsdoc"]
+roots = []
+indent = { tab-width = 2, unit = "  " }
+
+[[grammar]]
+name = "jsdoc"
+source = { git = "https://github.com/tree-sitter/tree-sitter-jsdoc", rev = "189a6a4829beb9cdbe837260653b4a3dfb0cc3db" }

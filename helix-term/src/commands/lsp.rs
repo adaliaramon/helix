@@ -44,13 +44,15 @@ fn location_to_file_location(location: &lsp::Location) -> FileLocation {
 }
 
 // TODO: share with symbol picker(symbol.location)
-// TODO: need to use push_jump() before?
 fn jump_to_location(
     editor: &mut Editor,
     location: &lsp::Location,
     offset_encoding: OffsetEncoding,
     action: Action,
 ) {
+    let (view, doc) = current!(editor);
+    push_jump(view, doc);
+
     let path = match location.uri.to_file_path() {
         Ok(path) => path,
         Err(_) => {
@@ -98,9 +100,10 @@ fn sym_picker(
             }
         },
         move |cx, symbol, action| {
-            if current_path2.as_ref() == Some(&symbol.location.uri) {
-                push_jump(cx.editor);
-            } else {
+            let (view, doc) = current!(cx.editor);
+            push_jump(view, doc);
+
+            if current_path2.as_ref() != Some(&symbol.location.uri) {
                 let uri = &symbol.location.uri;
                 let path = match uri.to_file_path() {
                     Ok(path) => path,
@@ -196,7 +199,8 @@ fn diag_picker(
         },
         move |cx, (url, diag), action| {
             if current_path.as_ref() == Some(url) {
-                push_jump(cx.editor);
+                let (view, doc) = current!(cx.editor);
+                push_jump(view, doc);
             } else {
                 let path = url.to_file_path().unwrap();
                 cx.editor.open(path, action).expect("editor.open failed");
@@ -605,8 +609,6 @@ fn goto_impl(
     locations: Vec<lsp::Location>,
     offset_encoding: OffsetEncoding,
 ) {
-    push_jump(editor);
-
     let cwdir = std::env::current_dir().expect("couldn't determine current directory");
 
     match locations.as_slice() {
